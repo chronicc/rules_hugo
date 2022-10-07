@@ -27,6 +27,17 @@ def relative_path(src, dirname):
     return src.short_path[i:]
 
 def copy_to_dir(ctx, srcs, dirname):
+    """Copy files between directories.
+
+    Args:
+        ctx: The bazel context.
+        srcs: A list of labels from where the files will be copied.
+        dirname: The name of the directory to which the files will be copied.
+
+    Returns:
+        A list of copied files.
+    """
+
     outs = []
     for i in srcs:
         if i.is_source:
