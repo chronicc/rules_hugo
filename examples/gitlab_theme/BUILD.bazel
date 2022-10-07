@@ -1,0 +1,23 @@
+load("@rules_hugo//hugo:rules.bzl", "hugo_serve", "hugo_site", "hugo_theme")
+
+hugo_theme(
+    name = "theme",
+    srcs = [
+        "@hugo_geekmod_theme//:files",
+    ],
+    theme_name = "geekmod",
+)
+
+hugo_site(
+    name = "site",
+    config = "config.toml",
+    content = glob(["content/**"]),
+    layouts = glob(["layouts/**"]),
+    static = glob(["static/**"]),
+    theme = ":theme",
+)
+
+hugo_serve(
+    name = "serve",
+    dep = [":site"],
+)
