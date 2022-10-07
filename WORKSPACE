@@ -1,8 +1,6 @@
-workspace(name = "build_stack_rules_hugo")
+workspace(name = "rules_hugo")
 
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-
-load("@build_stack_rules_hugo//hugo:rules.bzl", "github_hugo_theme", "hugo_repository")
+load("@rules_hugo//hugo:rules.bzl", "github_hugo_theme", "hugo_repository")
 
 hugo_repository(
     name = "hugo",

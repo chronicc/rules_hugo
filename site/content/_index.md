@@ -15,13 +15,13 @@ type: docs
 
 ## Add Workspace Dependencies
 
-Declare a dependency on `build_stack_rules_hugo` in your `WORKSPACE`:
+Declare a dependency on `rules_hugo` in your `WORKSPACE`:
 
 ```python
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 http_archive(
-    name = "build_stack_rules_hugo",
+    name = "rules_hugo",
     urls = ["https://github.com/stackb/rules_hugo/archive/6bca4c2786a54d7d7acfa76cd51b0a6370bd91c4.tar.gz"],
     strip_prefix = "rules_hugo-6bca4c2786a54d7d7acfa76cd51b0a6370bd91c4",
     sha256 = "7d2fe8b2ba4e6e662c79c1503890c2eb82d5717a411bb6fd805269758da40c9a",
@@ -31,7 +31,7 @@ http_archive(
 Declare a dependency on the hugo binary as well as a theme in your `WORKSPACE`:
 
 ```python
-load("@build_stack_rules_hugo//hugo:rules.bzl", "github_hugo_theme", "hugo_repository")
+load("@rules_hugo//hugo:rules.bzl", "github_hugo_theme", "hugo_repository")
 
 hugo_repository(
     name = "hugo",
@@ -67,7 +67,7 @@ $ touch site/BUILD.bazel
 Having the following rules:
 
 ```python
-load("@build_stack_rules_hugo//hugo:rules.bzl", "hugo_site", "hugo_theme")
+load("@rules_hugo//hugo:rules.bzl", "hugo_site", "hugo_theme")
 
 hugo_theme(
     name = "book",

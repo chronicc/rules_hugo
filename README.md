@@ -37,13 +37,13 @@ RULES_HUGO_COMMIT = "..."
 RULES_HUGO_SHA256 = "..."
 
 http_archive(
-    name = "build_stack_rules_hugo",
+    name = "rules_hugo",
     url = "https://github.com/stackb/rules_hugo/archive/%s.zip" % RULES_HUGO_COMMIT,
     sha256 = RULES_HUGO_SHA256,
     strip_prefix = "rules_hugo-%s" % RULES_HUGO_COMMIT
 )
 
-load("@build_stack_rules_hugo//hugo:rules.bzl", "hugo_repository", "github_hugo_theme")
+load("@rules_hugo//hugo:rules.bzl", "hugo_repository", "github_hugo_theme")
 
 #
 # Load hugo binary itself
@@ -68,7 +68,7 @@ github_hugo_theme(
 ### Declare a hugo_site in your BUILD file
 
 ```python
-load("@build_stack_rules_hugo//hugo:rules.bzl", "hugo_site", "hugo_theme", "hugo_serve")
+load("@rules_hugo//hugo:rules.bzl", "hugo_site", "hugo_theme", "hugo_serve")
 
 # Declare a theme 'xmin'.  In this case the `name` and
 # `theme_name` are identical, so the `theme_name` could be omitted in this case.
