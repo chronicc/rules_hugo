@@ -1,31 +1,20 @@
-# `rules_hugo`
-
-[![Build Status](https://api.cirrus-ci.com/github/stackb/rules_hugo.svg)](https://cirrus-ci.com/github/stackb/rules_hugo)
-
-
-<table><tr>
-<td><img src="https://bazel.build/images/bazel-icon.svg" height="120"/></td>
-<td><img src="https://raw.githubusercontent.com/gohugoio/hugoDocs/master/static/img/hugo-logo.png" height="120"/></td>
-</tr><tr>
-<td>Rules</td>
-<td>Hugo</td>
-</tr></table>
+# rules_hugo
 
 [Bazel](https://bazel.build) rules for building static websites with [Hugo](https://gohugo.io).
 
-## Repository Rules
+## Workspace Rules
 
-|               Name   |  Description |
-| -------------------: | :----------- |
-| [hugo_repository](#hugo_repository) | Load hugo dependency for this repo. |
-| [github_hugo_theme](#github_hugo_theme) | Load a hugo theme from github. |
+|                                    Name | Description                         |
+| ----------------: | :---------------------------------- |
+|   hugo_repository | Load hugo dependency for this repo. |
+| github_hugo_theme | Load a hugo theme from github.      |
 
 ## Build Rules
 
-|               Name   |  Description |
-| -------------------: | :----------- |
-| [hugo_site](#hugo_site) | Declare a hugo site. |
-| [hugo_theme](#hugo_theme) | Declare a hugo theme. |
+|                      Name | Description           |
+| ---------: | :-------------------- |
+|  hugo_site | Declare a hugo site.  |
+| hugo_theme | Declare a hugo theme. |
 
 ## Usage
 
@@ -37,13 +26,13 @@ RULES_HUGO_COMMIT = "..."
 RULES_HUGO_SHA256 = "..."
 
 http_archive(
-    name = "build_stack_rules_hugo",
-    url = "https://github.com/stackb/rules_hugo/archive/%s.zip" % RULES_HUGO_COMMIT,
+    name = "rules_hugo",
+    url = "https://github.com/chronicc/rules_hugo/archive/%s.zip" % RULES_HUGO_COMMIT,
     sha256 = RULES_HUGO_SHA256,
     strip_prefix = "rules_hugo-%s" % RULES_HUGO_COMMIT
 )
 
-load("@build_stack_rules_hugo//hugo:rules.bzl", "hugo_repository", "github_hugo_theme")
+load("@rules_hugo//hugo:rules.bzl", "hugo_repository", "github_hugo_theme")
 
 #
 # Load hugo binary itself
@@ -54,56 +43,52 @@ hugo_repository(
 )
 
 #
-# This makes a filegroup target "@com_github_yihui_hugo_xmin//:files"
+# This makes a filegroup target "@hugo_papermod_theme//:files"
 # available to your build files
 #
 github_hugo_theme(
-    name = "com_github_yihui_hugo_xmin",
-    owner = "yihui",
-    repo = "hugo-xmin",
-    commit = "c14ca049d0dd60386264ea68c91d8495809cc4c6",
+    name = "hugo_papermod_theme",
+    commit = "3a0a4811cbc07c0bea09ef55b3c1bfb39b48cddd",
+    owner = "adityatelange",
+    repo = "hugo-PaperMod",
 )
 ```
 
 ### Declare a hugo_site in your BUILD file
 
 ```python
-load("@build_stack_rules_hugo//hugo:rules.bzl", "hugo_site", "hugo_theme", "hugo_serve")
+load("@rules_hugo//hugo:rules.bzl", "hugo_site", "hugo_theme", "hugo_serve")
 
-# Declare a theme 'xmin'.  In this case the `name` and
-# `theme_name` are identical, so the `theme_name` could be omitted in this case.
+# Declare a theme 'PaperMod'.  
+# When the `name` and `theme_name` are identical, `theme_name` can be omitted.
 hugo_theme(
-    name = "xmin",
-    theme_name = "xmin",
+    name = "theme",
     srcs = [
-        "@com_github_yihui_hugo_xmin//:files",
+        "@hugo_papermod_theme//:files",
     ],
+    theme_name = "PaperMod",
 )
 
-# Declare a site. Config file is required.
-my_site_name = "basic"
-
+# Declare a site. The config file is mandatory.
 hugo_site(
-    name = my_site_name,
+    name = "site",
     config = "config.toml",
-    content = [
-        "_index.md",
-        "about.md",
-    ],
-    quiet = False,
-    theme = ":xmin",
+    content = glob(["content/**"]),
+    layouts = glob(["layouts/**"]),
+    static = glob(["static/**"]),
+    theme = ":theme",
 )
 
-# Run local development server
+# Run local development server.
 hugo_serve(
-    name = "local_%s" % my_site_name,
-    dep = [":%s" % my_site_name],
+    name = "serve",
+    dep = [":site"],
 )
 
-# Tar it up
+# Create a tar archive of the size.
 pkg_tar(
-    name = "%s_tar" % my_site_name,
-    srcs = [":%s" % my_site_name],
+    name = "site_tar",
+    srcs = [":site"],
 )
 ```
 
@@ -111,16 +96,17 @@ pkg_tar(
 
 The `hugo_site` target emits the output in the `bazel-bin` directory.
 
-```sh
-$ bazel build :basic
+```bash
+$ bazel build //site
 [...]
-Target //:basic up-to-date:
-  bazel-bin/basic
+Target //site:site up-to-date:
+  bazel-bin/site/site
 [...]
 ```
-```sh
-$ tree bazel-bin/basic
-bazel-bin/basic
+
+```bash
+$ tree bazel-bin/site/site
+bazel-bin/site/site
 ├── 404.html
 ├── about
 │   └── index.html
@@ -129,13 +115,9 @@ bazel-bin/basic
 
 The `pkg_tar` target emits a `%{name}_tar.tar` file containing all the Hugo output files.
 
-```sh
-$ bazel build :basic_tar
+```bash
+$ bazel build //site:site_tar
 [...]
-Target //:basic up-to-date:
-  bazel-bin/basic_tar.tar
+Target //site:site_tar up-to-date:
+  bazel-bin/site_tar.tar
 ```
-
-## End
-
-See source code for details about additional rule attributes / parameters.

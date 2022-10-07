@@ -1,23 +1,24 @@
-load("@build_stack_rules_hugo//hugo:rules.bzl", "hugo_site", "hugo_theme", "hugo_serve")
+load("@rules_hugo//hugo:rules.bzl", "hugo_serve", "hugo_site", "hugo_theme")
 
 hugo_theme(
-    name = "book",
+    name = "theme",
     srcs = [
-        "@com_github_alex_shpak_hugo_book//:files",
+        "@hugo_papermod_theme//:files",
     ],
+    theme_name = "PaperMod",
 )
 
 hugo_site(
     name = "site",
-    config = "config.yaml",
+    config = "config.toml",
     content = glob(["content/**"]),
-    static = glob(["static/**"]),
     layouts = glob(["layouts/**"]),
-    theme = ":book",
+    static = glob(["static/**"]),
+    theme = ":theme",
 )
 
 hugo_serve(
-    name = "site_serve",
+    name = "serve",
     dep = [":site"],
 )
 
