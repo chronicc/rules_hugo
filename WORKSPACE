@@ -8,8 +8,8 @@ hugo_repository(
 )
 
 github_hugo_theme(
-    name = "com_github_alex_shpak_hugo_book",
-    commit = "07048f7bf5097435a05c1e8b77241b0e478023c2",  # June 3, 2019
-    owner = "alex-shpak",
-    repo = "hugo-book",
+    name = "hugo_papermod_theme",
+    commit = "3a0a4811cbc07c0bea09ef55b3c1bfb39b48cddd",
+    owner = "adityatelange",
+    repo = "hugo-PaperMod",
 )

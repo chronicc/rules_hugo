@@ -1,0 +1,26 @@
+baseURL = "/"
+languageCode = "en-us"
+paginate = "5"
+theme = "PaperMod"
+title = "rules_hugo Example Site"
+
+# Required to get well formatted code blocks
+pygmentsUseClasses = true
+pygmentsCodeFences = true
+disablePathToLower = true
+enableGitInfo = false
+
+
+[minify]
+  disableXML = true
+  minifyOutput = true
+
+[params]
+  ShowReadingTime = true
+  ShowShareButtons = true
+  ShowPostNavLinks = true
+  ShowBreadCrumbs = true
+  ShowCodeCopyButtons = true
+  ShowWordCount = true
+  ShowRssButtonInSectionTermList = true
+  UseHugoToc = true
