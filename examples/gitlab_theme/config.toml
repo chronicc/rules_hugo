@@ -1,0 +1,17 @@
+baseURL = "/"
+languageCode = "en-us"
+paginate = "5"
+theme = "geekmod"
+title = "rules_hugo Example Site"
+
+# Required to get well formatted code blocks
+pygmentsUseClasses = true
+pygmentsCodeFences = true
+disablePathToLower = true
+enableGitInfo = false
+
+[minify]
+  disableXML = true
+  minifyOutput = true
+
+[params]
