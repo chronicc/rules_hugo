@@ -1,5 +1,7 @@
 """hugo_site, hugo_serve"""
 
+load("//hugo/internal:hugo_theme.bzl", "HugoThemeInfo")
+
 def relative_path(src, dirname):
     """Given a src File and a directory it's under, return the relative path.
 
@@ -72,7 +74,7 @@ def _hugo_site_impl(ctx):
 
     # Copy the theme
     if ctx.attr.theme:
-        theme = ctx.attr.theme.hugo_theme
+        theme = ctx.attr.theme[HugoThemeInfo]
         hugo_args += ["--theme", theme.name]
         for i in theme.files.to_list():
             path_list = i.short_path.split("/")
@@ -185,7 +187,7 @@ hugo_site = rule(
         # Optionally set the base_url as a hugo argument
         "base_url": attr.string(),
         "theme": attr.label(
-            providers = ["hugo_theme"],
+            providers = [HugoThemeInfo],
         ),
         # Emit quietly
         "quiet": attr.bool(
