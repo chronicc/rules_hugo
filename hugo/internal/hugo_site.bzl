@@ -1,3 +1,5 @@
+"""hugo_site, hugo_serve"""
+
 def relative_path(src, dirname):
     """Given a src File and a directory it's under, return the relative path.
 
@@ -76,9 +78,9 @@ def _hugo_site_impl(ctx):
             path_list = i.short_path.split("/")
             if i.short_path.startswith("../"):
                 o_filename = "/".join(["themes", theme.name] + path_list[2:])
-            elif i.short_path[len(theme.path):].startswith("/themes"): # check if themes is the first dir after theme path
+            elif i.short_path[len(theme.path):].startswith("/themes"):  # check if themes is the first dir after theme path
                 indx = path_list.index("themes")
-                o_filename = "/".join(["themes", theme.name] + path_list[indx+2:])
+                o_filename = "/".join(["themes", theme.name] + path_list[indx + 2:])
             else:
                 o_filename = "/".join(["themes", theme.name, i.short_path[len(theme.path):]])
             o = ctx.actions.declare_file(o_filename)
@@ -105,7 +107,7 @@ def _hugo_site_impl(ctx):
     if ctx.attr.base_url:
         hugo_args += ["--baseURL", ctx.attr.base_url]
     if ctx.attr.build_drafts:
-        hugo_args += ["--buildDrafts"]
+        hugo_args.append("--buildDrafts")
 
     ctx.actions.run(
         mnemonic = "GoHugo",
@@ -117,7 +119,7 @@ def _hugo_site_impl(ctx):
         tools = [hugo],
         execution_requirements = {
             "no-sandbox": "1",
-        }, 
+        },
     )
 
     files = depset([hugo_outputdir])
@@ -172,13 +174,13 @@ hugo_site = rule(
         # Files to be included in the i18n/ subdir
         "i18n": attr.label_list(
             allow_files = True,
-        ),        
+        ),
         # The hugo executable
         "hugo": attr.label(
             default = "@hugo//:hugo",
             allow_files = True,
             executable = True,
-            cfg = "host",
+            cfg = "exec",
         ),
         # Optionally set the base_url as a hugo argument
         "base_url": attr.string(),
@@ -229,31 +231,29 @@ def _hugo_serve_impl(ctx):
     executable_path = "./" + ctx.attr.hugo.files_to_run.executable.short_path
 
     runfiles = ctx.runfiles()
-    runfiles = runfiles.merge(ctx.runfiles(files=[ctx.attr.hugo.files_to_run.executable]))
+    runfiles = runfiles.merge(ctx.runfiles(files = [ctx.attr.hugo.files_to_run.executable]))
 
     for dep in ctx.attr.dep:
-        runfiles = runfiles.merge(dep.default_runfiles).merge(dep.data_runfiles).merge(ctx.runfiles(files=dep.files.to_list()))
-
+        runfiles = runfiles.merge(dep.default_runfiles).merge(dep.data_runfiles).merge(ctx.runfiles(files = dep.files.to_list()))
 
     script = ctx.actions.declare_file("{}-serve".format(ctx.label.name))
     script_content = _SERVE_SCRIPT_PREFIX + _SERVE_SCRIPT_TEMPLATE.format(
-        hugo_bin=executable_path,
-        args=" ".join(hugo_args),
+        hugo_bin = executable_path,
+        args = " ".join(hugo_args),
     )
-    ctx.actions.write(output=script, content=script_content, is_executable=True)
+    ctx.actions.write(output = script, content = script_content, is_executable = True)
 
     ctx.actions.run_shell(
         mnemonic = "GoHugoServe",
         tools = [script, hugo],
         command = script.path,
         outputs = hugo_outputs,
-        execution_requirements={
+        execution_requirements = {
             "no-sandbox": "1",
         },
     )
 
-    return [DefaultInfo(executable=script, runfiles=runfiles)]
-
+    return [DefaultInfo(executable = script, runfiles = runfiles)]
 
 hugo_serve = rule(
     attrs = {
@@ -262,10 +262,10 @@ hugo_serve = rule(
             default = "@hugo//:hugo",
             allow_files = True,
             executable = True,
-            cfg = "host",
+            cfg = "exec",
         ),
         "dep": attr.label_list(
-            mandatory=True,
+            mandatory = True,
         ),
         # Disable fast render
         "disable_fast_render": attr.bool(
