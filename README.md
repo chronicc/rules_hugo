@@ -2,23 +2,17 @@
 
 [Bazel](https://bazel.build) rules for building static websites with [Hugo](https://gohugo.io).
 
-## Workspace Rules
+- [Rules](#rules)
+- [Usage](#usage)
 
-|                                    Name | Description                         |
-| ----------------: | :---------------------------------- |
-|   hugo_repository | Load hugo dependency for this repo. |
-| github_hugo_theme | Load a hugo theme from github.      |
+## Rules
 
-## Build Rules
-
-|                      Name | Description           |
-| ---------: | :-------------------- |
-|  hugo_site | Declare a hugo site.  |
-| hugo_theme | Declare a hugo theme. |
+- [Workspace Rules](documentation/workspace_rules.md)
+- [Build Rules](documentation/build_rules.md)
 
 ## Usage
 
-### Add rules_hugo to your WORKSPACE and add a theme from github
+**Add rules_hugo to your WORKSPACE and add a theme from github**
 
 ```python
 # Update these to latest
@@ -54,7 +48,7 @@ github_hugo_theme(
 )
 ```
 
-### Declare a hugo_site in your BUILD file
+**Declare a hugo_site in your BUILD file**
 
 ```python
 load("@rules_hugo//hugo:rules.bzl", "hugo_site", "hugo_theme", "hugo_serve")
@@ -92,7 +86,7 @@ pkg_tar(
 )
 ```
 
-### Build the site
+**Build the site**
 
 The `hugo_site` target emits the output in the `bazel-bin` directory.
 

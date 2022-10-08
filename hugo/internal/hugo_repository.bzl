@@ -36,12 +36,13 @@ def _hugo_repository_impl(ctx):
 hugo_repository = repository_rule(
     _hugo_repository_impl,
     attrs = {
+        # When updating the version, also update the version in documentation/workspace_rules.md
         "version": attr.string(
             default = "0.101.0",
             doc = "The hugo version to use.",
         ),
         "sha256": attr.string(
-            doc = "The sha256 value for the binary.",
+            doc = "The sha256 hash of the binary.",
         ),
         "os_arch": attr.string(
             doc = "The operating system architecture. Leave empty for autodetect.",
