@@ -1,14 +1,31 @@
 # Build Rules
 
+- [hugo_config](#hugo_config)
 - [hugo_site](#hugo_site)
 - [hugo_serve](#hugo_serve)
 - [hugo_theme](#hugo_theme)
+
+## hugo_config
+
+```shell
+hugo_config(name, params)
+```
+
+A rule that declares a hugo config file.
+
+**Attributes**
+
+| Name           | Description    | Type           | Mandatory      | Default        |
+| :------------- | :------------- | :------------- | :------------- | :------------- |
+| name | A unique name for this target. | [name](https://bazel.build/docs/build-ref.html#name) | required | |
+| params | Adds key value pairs to the params section of the config file. If the key already exists in the config, it is overwritten. | [Dictionary: String -> String](https://bazel.build/docs/skylark/lib/dict.html) | optional | |
+| src | A hugo config file. Allowed file types are json, toml and yaml. | [Label](https://bazel.build/docs/build-ref.html#labels) | required | |
 
 ## hugo_site
 
 ```shell
 hugo_site(name, archetypes, assets, base_url, build_drafts, config, content,
-          data, hugo, i18n, images, layouts, quiet, static, verbose)
+          data, hugo, i18n, images, layouts, params, quiet, static, verbose)
 ```
 
 A rule that builds a hugo site.
@@ -22,7 +39,7 @@ A rule that builds a hugo site.
 | assets | Files to be included in the assets/ subdir. | [List of labels](https://bazel.build/docs/build-ref.html#labels) | optional | |
 | base_url | Optionally set the base_url as a hugo argument. | String | optional | |
 | build_drafts | Build content marked as draft. | Boolean | optional | `False` |
-| config | A hugo config file. Allowed file types are toml, yaml and json. | [Label](https://bazel.build/docs/build-ref.html#labels) | required | |
+| config | The output of a [hugo_config](#hugo_config) target. | [Label](https://bazel.build/docs/build-ref.html#labels) | required | |
 | content | Files to be included in the content/ subdir. | [List of labels](https://bazel.build/docs/build-ref.html#labels) | optional | |
 | data | Files to be included in the data/ subdir. | [List of labels](https://bazel.build/docs/build-ref.html#labels) | optional | |
 | hugo | The hugo executable. | [Label](https://bazel.build/docs/build-ref.html#labels) | optional | "@hugo//:hugo" |

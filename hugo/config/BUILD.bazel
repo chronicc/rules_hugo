@@ -1,0 +1,5 @@
+sh_binary(
+    name = "update_toml",
+    srcs = ["update_toml.sh"],
+    visibility = ["//visibility:public"],
+)

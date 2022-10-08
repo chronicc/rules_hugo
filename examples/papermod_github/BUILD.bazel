@@ -1,4 +1,4 @@
-load("@rules_hugo//hugo:rules.bzl", "hugo_serve", "hugo_site", "hugo_theme")
+load("@rules_hugo//hugo:rules.bzl", "hugo_config", "hugo_serve", "hugo_site", "hugo_theme")
 
 hugo_theme(
     name = "theme",
@@ -8,9 +8,14 @@ hugo_theme(
     theme_name = "PaperMod",
 )
 
+hugo_config(
+    name = "config",
+    src = "config.toml",
+)
+
 hugo_site(
     name = "site",
-    config = "config.toml",
+    config = ":config",
     content = glob(["content/**"]),
     layouts = glob(["layouts/**"]),
     static = glob(["static/**"]),

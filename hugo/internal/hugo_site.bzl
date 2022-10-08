@@ -60,15 +60,9 @@ def _hugo_site_impl(ctx):
     hugo_outputs = [hugo_outputdir]
     hugo_args = []
 
-    # Copy the config file into place
-    config_file = ctx.actions.declare_file(ctx.file.config.basename)
-    ctx.actions.run_shell(
-        inputs = [ctx.file.config],
-        outputs = [config_file],
-        command = 'cp "$1" "$2"',
-        arguments = [ctx.file.config.path, config_file.path],
-    )
-    hugo_inputs.append(config_file)
+    # Add config to inputs
+    config = ctx.attr.config.files.to_list().pop()
+    hugo_inputs.append(config)
 
     # Copy all the files over
     for name, srcs in {
@@ -108,7 +102,7 @@ def _hugo_site_impl(ctx):
     # Prepare hugo command
     hugo_args += [
         "--source",
-        config_file.dirname,
+        config.dirname,
         "--destination",
         ctx.label.name,
     ]
@@ -147,12 +141,6 @@ hugo_site = rule(
     attrs = {
         # Hugo config file
         "config": attr.label(
-            allow_single_file = [
-                ".toml",
-                ".yaml",
-                ".yml",
-                ".json",
-            ],
             mandatory = True,
         ),
         # Files to be included in the content/ subdir
