@@ -10,7 +10,6 @@ pygmentsCodeFences = true
 disablePathToLower = true
 enableGitInfo = false
 
-
 [minify]
   disableXML = true
   minifyOutput = true

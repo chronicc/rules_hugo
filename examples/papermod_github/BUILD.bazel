@@ -3,9 +3,9 @@ load("@rules_hugo//hugo:rules.bzl", "hugo_serve", "hugo_site", "hugo_theme")
 hugo_theme(
     name = "theme",
     srcs = [
-        "@hugo_geekmod_theme//:files",
+        "@hugo_papermod_theme_github//:files",
     ],
-    theme_name = "geekmod",
+    theme_name = "PaperMod",
 )
 
 hugo_site(
@@ -20,4 +20,10 @@ hugo_site(
 hugo_serve(
     name = "serve",
     dep = [":site"],
+)
+
+sh_test(
+    name = "site_test",
+    srcs = ["site_test.sh"],
+    data = [":site"],
 )
