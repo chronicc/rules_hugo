@@ -23,7 +23,7 @@ gitlab_hugo_theme(
 )
 
 gitlab_hugo_theme(
-    name = "hugo_geekmod_theme_gitlab",
+    name = "hugo_geekdoc_theme_gitlab",
     commit = "78ed88918085f72e47388b917848a9622b03cf30",
     project_id = "40046611",
     repo = "hugo-geekdoc",

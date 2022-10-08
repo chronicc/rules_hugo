@@ -12,13 +12,13 @@ filegroup(
 
 DEFAULT_GITLAB_HOST = "gitlab.com"
 
-def gitlab_hugo_theme(name, repo, project_id, commit, sha256 = "", host = DEFAULT_GITLAB_HOST, **kwargs):
+def gitlab_hugo_theme(name, project_id, repo, commit, sha256 = "", host = DEFAULT_GITLAB_HOST, **kwargs):
     """Download a hugo theme from Gitlab.
 
     Args:
         name: The name of the target.
-        repo: The name of the repository.
         project_id: The unique id of the repository.
+        repo: The name of the repository.
         commit: The full commit hash of the commit for which the theme will be downloaded.
         sha256: The sha256 sum hash of the commit archive.
         host: The domain of the Github server. Default: gitlab.com

@@ -48,6 +48,7 @@ hugo_repository = repository_rule(
             doc = "The operating system architecture. Leave empty for autodetect.",
         ),
         "extended": attr.bool(
+            default = False,
             doc = "If set to true, the extended hugo version is used.",
         ),
     },
