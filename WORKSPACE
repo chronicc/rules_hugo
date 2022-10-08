@@ -8,14 +8,22 @@ hugo_repository(
 )
 
 github_hugo_theme(
-    name = "hugo_papermod_theme",
+    name = "hugo_papermod_theme_github",
     commit = "3a0a4811cbc07c0bea09ef55b3c1bfb39b48cddd",
     owner = "adityatelange",
     repo = "hugo-PaperMod",
 )
 
 gitlab_hugo_theme(
-    name = "hugo_geekmod_theme",
+    name = "hugo_papermod_theme_gitlab",
+    commit = "3a0a4811cbc07c0bea09ef55b3c1bfb39b48cddd",
+    project_id = "40058961",
+    repo = "hugo-PaperMod",
+    sha256 = "b3121eaca6fea68d51acd3b59c48ebb8333250e7a47a9c40d890d3bfb70ca080",
+)
+
+gitlab_hugo_theme(
+    name = "hugo_geekmod_theme_gitlab",
     commit = "78ed88918085f72e47388b917848a9622b03cf30",
     project_id = "40046611",
     repo = "hugo-geekdoc",
