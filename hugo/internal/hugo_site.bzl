@@ -118,7 +118,7 @@ def _hugo_site_impl(ctx):
     if ctx.attr.verbose:
         hugo_args.append("--verbose")
     if ctx.attr.base_url:
-        hugo_args += ["--baseURL", ctx.attr.base_url]
+        hugo_args += ["--baseURL", ctx.expand_make_variables("base_url", ctx.attr.base_url, {})]
     if ctx.attr.build_drafts:
         hugo_args.append("--buildDrafts")
 
