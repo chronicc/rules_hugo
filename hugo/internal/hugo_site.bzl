@@ -122,6 +122,10 @@ def _hugo_site_impl(ctx):
     if ctx.attr.build_drafts:
         hugo_args.append("--buildDrafts")
 
+    env = {}
+    for k,v in ctx.attr.env.items():
+      env[k] = ctx.expand_make_variables(k, v, {})
+
     ctx.actions.run(
         mnemonic = "GoHugo",
         progress_message = "Generating hugo site",
@@ -133,6 +137,7 @@ def _hugo_site_impl(ctx):
         execution_requirements = {
             "no-sandbox": "1",
         },
+        env = env,
     )
 
     files = depset([hugo_outputdir])
@@ -195,6 +200,7 @@ hugo_site = rule(
             executable = True,
             cfg = "exec",
         ),
+        "env": attr.string_dict(),
         # Optionally set the base_url as a hugo argument
         "base_url": attr.string(),
         "theme": attr.label(
