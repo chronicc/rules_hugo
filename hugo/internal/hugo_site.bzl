@@ -123,8 +123,8 @@ def _hugo_site_impl(ctx):
         hugo_args.append("--buildDrafts")
 
     env = {}
-    for k,v in ctx.attr.env.items():
-      env[k] = ctx.expand_make_variables(k, v, {})
+    for k, v in ctx.attr.env.items():
+        env[k] = ctx.expand_make_variables(k, v, {})
 
     ctx.actions.run(
         mnemonic = "GoHugo",
@@ -255,8 +255,12 @@ def _hugo_serve_impl(ctx):
     for dep in ctx.attr.dep:
         runfiles = runfiles.merge(dep.default_runfiles).merge(dep.data_runfiles).merge(ctx.runfiles(files = dep.files.to_list()))
 
+    _SERVE_SCRIPT_ENV = ""
+    for k, v in ctx.attr.env.items():
+        _SERVE_SCRIPT_ENV += "export {}={}\n".format(k, ctx.expand_make_variables(k, v, {}))
+
     script = ctx.actions.declare_file("{}-serve".format(ctx.label.name))
-    script_content = _SERVE_SCRIPT_PREFIX + _SERVE_SCRIPT_TEMPLATE.format(
+    script_content = _SERVE_SCRIPT_PREFIX + _SERVE_SCRIPT_ENV + _SERVE_SCRIPT_TEMPLATE.format(
         hugo_bin = executable_path,
         args = " ".join(hugo_args),
     )
@@ -290,6 +294,7 @@ hugo_serve = rule(
         "disable_fast_render": attr.bool(
             default = False,
         ),
+        "env": attr.string_dict(),
         # Emit quietly
         "quiet": attr.bool(
             default = True,
