@@ -46,6 +46,7 @@ A rule that serves a hugo site.
 | Name           | Description    | Type           | Mandatory      | Default        |
 | :------------- | :------------- | :------------- | :------------- | :------------- |
 | name | A unique name for this target. | [name](https://bazel.build/docs/build-ref.html#name) | required | |
+| bind | Interface to which the server will bind. | [string](https://bazel.build/rules/lib/attr#string) | optional | 127.0.0.1 |
 | dep | The output of a `hugo_site` target. | [Label](https://bazel.build/docs/build-ref.html#labels) | required | |
 | hugo | The hugo executable. | [Label](https://bazel.build/docs/build-ref.html#labels) | optional | "@hugo//:hugo" |
 | disable_fast_render | Disable fast render. | Boolean | optional | `False` |

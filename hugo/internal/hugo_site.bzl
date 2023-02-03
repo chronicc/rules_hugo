@@ -240,6 +240,8 @@ def _hugo_serve_impl(ctx):
     hugo_outputs = [hugo_outfile]
     hugo_args = []
 
+    if ctx.attr.bind:
+        hugo_args.append("--bind {}".format(ctx.attr.bind))
     if ctx.attr.quiet:
         hugo_args.append("--quiet")
     if ctx.attr.quiet:
@@ -280,6 +282,10 @@ def _hugo_serve_impl(ctx):
 
 hugo_serve = rule(
     attrs = {
+        "bind": attr.string(
+            default = "127.0.0.1",
+            doc = "Interface to which the server will bind (default \"127.0.0.1\")",
+        ),
         # The hugo executable
         "hugo": attr.label(
             default = "@hugo//:hugo",
