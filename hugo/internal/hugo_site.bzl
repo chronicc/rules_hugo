@@ -53,6 +53,17 @@ def copy_to_dir(ctx, srcs, dirname):
             outs.append(i)
     return outs
 
+_BUILD_SCRIPT_PREFIX = """#!/bin/bash
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+trap exit_gracefully SIGINT
+function exit_gracefully() {
+    exit 0;
+}
+
+"""
+_BUILD_SCRIPT_TEMPLATE = """{hugo_bin} -s $DIR {args}"""
+
 def _hugo_site_impl(ctx):
     hugo = ctx.executable.hugo
     hugo_inputs = []
@@ -122,31 +133,33 @@ def _hugo_site_impl(ctx):
     if ctx.attr.build_drafts:
         hugo_args.append("--buildDrafts")
 
-    env = {}
-    for k, v in ctx.attr.env.items():
-        env[k] = ctx.expand_make_variables(k, v, {})
+    files = depset([hugo_outputdir])
+    runfiles = ctx.runfiles(files = [hugo] + [hugo_outputdir] + hugo_inputs)
 
-    ctx.actions.run(
+    _BUILD_SCRIPT_ENV = ""
+    for k, v in ctx.attr.env.items():
+        _BUILD_SCRIPT_ENV += "export {}={}\n".format(k, ctx.expand_make_variables(k, v, {}))
+    for k, v in ctx.attr.env_from_files.items():
+        _BUILD_SCRIPT_ENV += "export {}=$(cat {})\n".format(v, k.files.to_list()[0].path)
+
+    script = ctx.actions.declare_file("{}-build".format(ctx.label.name))
+    script_content = _BUILD_SCRIPT_PREFIX + _BUILD_SCRIPT_ENV + _BUILD_SCRIPT_TEMPLATE.format(
+        hugo_bin = hugo.path,
+        args = " ".join(hugo_args),
+    )
+    ctx.actions.write(output = script, content = script_content, is_executable = True)
+
+    ctx.actions.run_shell(
         mnemonic = "GoHugo",
-        progress_message = "Generating hugo site",
-        executable = hugo,
-        arguments = hugo_args,
-        inputs = hugo_inputs,
+        tools = [script, hugo],
+        command = script.path,
         outputs = hugo_outputs,
-        tools = [hugo],
         execution_requirements = {
             "no-sandbox": "1",
         },
-        env = env,
     )
 
-    files = depset([hugo_outputdir])
-    runfiles = ctx.runfiles(files = [hugo_outputdir] + hugo_inputs)
-
-    return [DefaultInfo(
-        files = files,
-        runfiles = runfiles,
-    )]
+    return [DefaultInfo(files = files, executable = script, runfiles = runfiles)]
 
 hugo_site = rule(
     attrs = {
@@ -201,6 +214,7 @@ hugo_site = rule(
             cfg = "exec",
         ),
         "env": attr.string_dict(),
+        "env_from_files": attr.label_keyed_string_dict(),
         # Optionally set the base_url as a hugo argument
         "base_url": attr.string(),
         "theme": attr.label(
@@ -260,6 +274,8 @@ def _hugo_serve_impl(ctx):
     _SERVE_SCRIPT_ENV = ""
     for k, v in ctx.attr.env.items():
         _SERVE_SCRIPT_ENV += "export {}={}\n".format(k, ctx.expand_make_variables(k, v, {}))
+    for k, v in ctx.attr.env_from_files.items():
+        _SERVE_SCRIPT_ENV += "export {}=$(cat {})\n".format(v, k.files.to_list()[0].path)
 
     script = ctx.actions.declare_file("{}-serve".format(ctx.label.name))
     script_content = _SERVE_SCRIPT_PREFIX + _SERVE_SCRIPT_ENV + _SERVE_SCRIPT_TEMPLATE.format(
@@ -301,6 +317,7 @@ hugo_serve = rule(
             default = False,
         ),
         "env": attr.string_dict(),
+        "env_from_files": attr.label_keyed_string_dict(),
         # Emit quietly
         "quiet": attr.bool(
             default = True,
