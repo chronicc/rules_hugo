@@ -1,14 +1,14 @@
 # Build Rules
 
-- [hugo_site](#hugo_site)
-- [hugo_serve](#hugo_serve)
-- [hugo_theme](#hugo_theme)
+- [hugo\_site](#hugo_site)
+- [hugo\_serve](#hugo_serve)
+- [hugo\_theme](#hugo_theme)
 
 ## hugo_site
 
 ```shell
 hugo_site(name, archetypes, assets, base_url, build_drafts, config, content,
-          data, hugo, i18n, images, layouts, quiet, static, verbose)
+          data, hugo, i18n, images, layouts, quiet, static, verbose, env, env_from_files)
 ```
 
 A rule that builds a hugo site.
@@ -25,6 +25,8 @@ A rule that builds a hugo site.
 | config | A hugo config file. Allowed file types are toml, yaml and json. | [Label](https://bazel.build/docs/build-ref.html#labels) | required | |
 | content | Files to be included in the content/ subdir. | [List of labels](https://bazel.build/docs/build-ref.html#labels) | optional | |
 | data | Files to be included in the data/ subdir. | [List of labels](https://bazel.build/docs/build-ref.html#labels) | optional | |
+| env | A dictionary of environment variables (`{"NAME": "value"}`). | [String dict](https://bazel.build/rules/lib/toplevel/attr#string_dict) | optional |
+| env_from_files | A dictionary for mapping file contents to environment variables (`{":file}": "NAME"}`) | [Label keyed string dict](https://bazel.build/rules/lib/toplevel/attr#label_keyed_string_dict) | optional |
 | hugo | The hugo executable. | [Label](https://bazel.build/docs/build-ref.html#labels) | optional | "@hugo//:hugo" |
 | i18n | Files to be included in the i18n/ subdir. | [List of labels](https://bazel.build/docs/build-ref.html#labels) | optional | |
 | images | Files to be included in the images/ subdir. | [List of labels](https://bazel.build/docs/build-ref.html#labels) | optional | |
@@ -48,6 +50,8 @@ A rule that serves a hugo site.
 | name | A unique name for this target. | [name](https://bazel.build/docs/build-ref.html#name) | required | |
 | bind | Interface to which the server will bind. | [string](https://bazel.build/rules/lib/attr#string) | optional | 127.0.0.1 |
 | dep | The output of a `hugo_site` target. | [Label](https://bazel.build/docs/build-ref.html#labels) | required | |
+| env | A dictionary of environment variables (`{"NAME": "value"}`). | [String dict](https://bazel.build/rules/lib/toplevel/attr#string_dict) | optional |
+| env_from_files | A dictionary for mapping file contents to environment variables (`{":file}": "NAME"}`) | [Label keyed string dict](https://bazel.build/rules/lib/toplevel/attr#label_keyed_string_dict) | optional |
 | hugo | The hugo executable. | [Label](https://bazel.build/docs/build-ref.html#labels) | optional | "@hugo//:hugo" |
 | disable_fast_render | Disable fast render. | Boolean | optional | `False` |
 | quiet | Emit quietly. | Boolean | optional | `True` |

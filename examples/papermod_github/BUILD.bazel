@@ -1,4 +1,5 @@
 load("@rules_hugo//hugo:rules.bzl", "hugo_serve", "hugo_site", "hugo_theme")
+load("@rules_pkg//pkg:mappings.bzl", "pkg_files")
 
 hugo_theme(
     name = "theme",
@@ -8,6 +9,11 @@ hugo_theme(
     theme_name = "PaperMod",
 )
 
+pkg_files(
+    name = "env_file",
+    srcs = glob(["env_file_test"]),
+)
+
 hugo_site(
     name = "site",
     config = "config.toml",
@@ -15,11 +21,17 @@ hugo_site(
     layouts = glob(["layouts/**"]),
     static = glob(["static/**"]),
     theme = ":theme",
+    env_from_files = {
+        ":env_file": "ENV_FILE_TEST",
+    },
 )
 
 hugo_serve(
     name = "serve",
     dep = [":site"],
+    env_from_files = {
+        ":env_file": "ENV_FILE_TEST",
+    },
 )
 
 sh_test(
