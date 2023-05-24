@@ -9,11 +9,6 @@ hugo_theme(
     theme_name = "PaperMod",
 )
 
-pkg_files(
-    name = "env_file",
-    srcs = glob(["env_file_test"]),
-)
-
 hugo_site(
     name = "site",
     config = "config.toml",
@@ -22,16 +17,13 @@ hugo_site(
     static = glob(["static/**"]),
     theme = ":theme",
     env_from_files = {
-        ":env_file": "ENV_FILE_TEST",
+        "//:commit_id": "HUGO_PARAMS_commitId",
     },
 )
 
 hugo_serve(
     name = "serve",
     dep = [":site"],
-    env_from_files = {
-        ":env_file": "ENV_FILE_TEST",
-    },
 )
 
 sh_test(

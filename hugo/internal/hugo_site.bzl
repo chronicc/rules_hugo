@@ -133,14 +133,20 @@ def _hugo_site_impl(ctx):
     if ctx.attr.build_drafts:
         hugo_args.append("--buildDrafts")
 
-    files = depset([hugo_outputdir])
-    runfiles = ctx.runfiles(files = [hugo] + [hugo_outputdir] + hugo_inputs)
-
     _BUILD_SCRIPT_ENV = ""
     for k, v in ctx.attr.env.items():
         _BUILD_SCRIPT_ENV += "export {}={}\n".format(k, ctx.expand_make_variables(k, v, {}))
     for k, v in ctx.attr.env_from_files.items():
-        _BUILD_SCRIPT_ENV += "export {}=$(cat {})\n".format(v, k.files.to_list()[0].path)
+        i = k.files.to_list()[0]
+        o = ctx.actions.declare_file(i.basename)
+        ctx.actions.run_shell(
+            inputs = [i],
+            outputs = [o],
+            command = 'cp -r -L "$1" "$2"',
+            arguments = [i.path, o.path],
+        )
+        hugo_inputs.append(o)
+        _BUILD_SCRIPT_ENV += "export {0}=$(cat {1})\n".format(v, o.path)
 
     script = ctx.actions.declare_file("{}-build".format(ctx.label.name))
     script_content = _BUILD_SCRIPT_PREFIX + _BUILD_SCRIPT_ENV + _BUILD_SCRIPT_TEMPLATE.format(
@@ -149,11 +155,15 @@ def _hugo_site_impl(ctx):
     )
     ctx.actions.write(output = script, content = script_content, is_executable = True)
 
+    files = depset([hugo_outputdir])
+    runfiles = ctx.runfiles(files = [hugo] + [hugo_outputdir] + hugo_inputs)
+
     ctx.actions.run_shell(
         mnemonic = "GoHugo",
         tools = [script, hugo],
         command = script.path,
         outputs = hugo_outputs,
+        inputs = hugo_inputs,
         execution_requirements = {
             "no-sandbox": "1",
         },
@@ -214,7 +224,9 @@ hugo_site = rule(
             cfg = "exec",
         ),
         "env": attr.string_dict(),
-        "env_from_files": attr.label_keyed_string_dict(),
+        "env_from_files": attr.label_keyed_string_dict(
+            allow_files = True,
+        ),
         # Optionally set the base_url as a hugo argument
         "base_url": attr.string(),
         "theme": attr.label(
@@ -250,6 +262,7 @@ _SERVE_SCRIPT_TEMPLATE = """{hugo_bin} serve -s $DIR {args}"""
 def _hugo_serve_impl(ctx):
     """ This is a long running process used for development"""
     hugo = ctx.executable.hugo
+    hugo_inputs = []
     hugo_outfile = ctx.actions.declare_file("{}.out".format(ctx.label.name))
     hugo_outputs = [hugo_outfile]
     hugo_args = []
@@ -263,32 +276,38 @@ def _hugo_serve_impl(ctx):
     if ctx.attr.disable_fast_render:
         hugo_args.append("--disableFastRender")
 
-    executable_path = "./" + ctx.attr.hugo.files_to_run.executable.short_path
-
-    runfiles = ctx.runfiles()
-    runfiles = runfiles.merge(ctx.runfiles(files = [ctx.attr.hugo.files_to_run.executable]))
-
-    for dep in ctx.attr.dep:
-        runfiles = runfiles.merge(dep.default_runfiles).merge(dep.data_runfiles).merge(ctx.runfiles(files = dep.files.to_list()))
-
     _SERVE_SCRIPT_ENV = ""
     for k, v in ctx.attr.env.items():
         _SERVE_SCRIPT_ENV += "export {}={}\n".format(k, ctx.expand_make_variables(k, v, {}))
     for k, v in ctx.attr.env_from_files.items():
-        _SERVE_SCRIPT_ENV += "export {}=$(cat {})\n".format(v, k.files.to_list()[0].path)
+        i = k.files.to_list()[0]
+        o = ctx.actions.declare_file(i.basename)
+        ctx.actions.run_shell(
+            inputs = [i],
+            outputs = [o],
+            command = 'cp -r -L "$1" "$2"',
+            arguments = [i.path, o.path],
+        )
+        hugo_inputs.append(o)
+        _SERVE_SCRIPT_ENV += "export {0}=$(cat {1})\n".format(v, o.path)
 
     script = ctx.actions.declare_file("{}-serve".format(ctx.label.name))
     script_content = _SERVE_SCRIPT_PREFIX + _SERVE_SCRIPT_ENV + _SERVE_SCRIPT_TEMPLATE.format(
-        hugo_bin = executable_path,
+        hugo_bin = hugo.path,
         args = " ".join(hugo_args),
     )
     ctx.actions.write(output = script, content = script_content, is_executable = True)
+
+    runfiles = ctx.runfiles(files = [hugo] + hugo_inputs)
+    for dep in ctx.attr.dep:
+        runfiles = runfiles.merge(dep.default_runfiles).merge(dep.data_runfiles).merge(ctx.runfiles(files = dep.files.to_list()))
 
     ctx.actions.run_shell(
         mnemonic = "GoHugoServe",
         tools = [script, hugo],
         command = script.path,
         outputs = hugo_outputs,
+        inputs = hugo_inputs,
         execution_requirements = {
             "no-sandbox": "1",
         },
@@ -317,7 +336,9 @@ hugo_serve = rule(
             default = False,
         ),
         "env": attr.string_dict(),
-        "env_from_files": attr.label_keyed_string_dict(),
+        "env_from_files": attr.label_keyed_string_dict(
+            allow_files = True,
+        ),
         # Emit quietly
         "quiet": attr.bool(
             default = True,

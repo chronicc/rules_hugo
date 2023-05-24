@@ -3,6 +3,8 @@ title: Startpage
 type: docs
 ---
 
+Git Commit ID: {{< param commitId >}}
+
 # Lorem Ipsum
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Scelerisque in dictum non consectetur a erat nam at. Enim eu turpis egestas pretium. Non blandit massa enim nec. Fringilla ut morbi tincidunt augue. Pulvinar mattis nunc sed blandit libero volutpat. Leo in vitae turpis massa. Nunc scelerisque viverra mauris in aliquam sem fringilla ut. Feugiat pretium nibh ipsum consequat nisl. Amet volutpat consequat mauris nunc congue nisi vitae suscipit. Adipiscing enim eu turpis egestas pretium aenean. Nulla porttitor massa id neque.

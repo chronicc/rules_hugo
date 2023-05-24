@@ -1,0 +1,18 @@
+sh_binary(
+    name = "get_commid_id",
+    srcs = ["scripts/get_commit_id.sh"],
+)
+
+genrule(
+    name = "commit_id",
+    srcs = glob([
+        ".git/**/*",
+    ]),
+    outs = ["commit_id.txt"],
+    cmd = """
+    $(location :get_commid_id) $(location .git/HEAD) > $@
+    """,
+    message = "Extracting commit id from git repository",
+    tools = [":get_commid_id"],
+    visibility = ["//visibility:public"],
+)
